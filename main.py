@@ -76,7 +76,9 @@ async def handle_outgoing_call(request: Request):
     response.pause(length=1)
     response.say("O.K. you can start talking!")
     connect = Connect()
+    print("before stream")
     connect.stream(url=f'wss://{request.url.hostname}/media-stream')
+    print("after stream")
     response.append(connect)
     return HTMLResponse(content=str(response), media_type="application/xml")
 
@@ -87,12 +89,14 @@ async def handle_media_stream(websocket: WebSocket):
     await websocket.accept()
 
     async with websockets.connect(
-        'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-10-01',
+        
+        'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview',
         extra_headers={
             "Authorization": f"Bearer {OPENAI_API_KEY}",
             "OpenAI-Beta": "realtime=v1"
         }
     ) as openai_ws:
+        print("inside open ai")
         await send_session_update(openai_ws)
         stream_sid = None
         session_id = None
